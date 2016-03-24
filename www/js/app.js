@@ -6,29 +6,39 @@
 // 'starter.controllers' is found in controllers.js
 angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
 
-.run(function($ionicPlatform, $rootScope, $auth, $location, $formsAPI) {
+.run(function($ionicPlatform, $rootScope, $auth, $location, $formsAPI, $ionicPopup) {
   $ionicPlatform.ready(function() {
 	// Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
 	// for form inputs)
-	if (window.cordova && window.cordova.plugins.Keyboard) {
+	//if (window.cordova && window.cordova.plugins.Keyboard) {
 	  //cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
 	  //cordova.plugins.Keyboard.disableScroll(true);
 
-	}
-	if (window.StatusBar) {
+	//}
+	//if (window.StatusBar) {
 	  // org.apache.cordova.statusbar required
-	  StatusBar.styleDefault();
-	}
+	  //StatusBar.styleDefault();
+	//}
 
 	$formsAPI.boot();
 	$auth.boot();
+
+  $ionicPopup.alert({
+    title: 'Don\'t eat that!',
+    template: 'It might taste good'
+   });
 
 	console.log('Hizo boot');
 
   });
 })
 
-.config(function($stateProvider, $urlRouterProvider) {
+.config(function($stateProvider, $urlRouterProvider, $httpProvider) {
+
+
+  $httpProvider.defaults.useXDomain = true;
+  delete $httpProvider.defaults.headers.common['X-Requested-With'];
+
   $stateProvider
 
 	.state('app', {

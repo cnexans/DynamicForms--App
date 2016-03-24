@@ -17,18 +17,16 @@ services.service("$auth", function($http, $q, $state, $localStorage) {
 		var _this = this;
 
 
-		var user = $localStorage.getUserData();
-		if ( user === null || user === '' || (typeof user === 'undefined') )
-			return;
-
-		_this.setUser( user );
-
-		(function(username, password) {
-			_this.getAccessToken(username, password).then(function(data) {
-				if ( typeof data.error === 'undefined' )
-					$localStorage.set('lastLogin', (new Date()).getTime(), false);
-			});
-		})(user.username, user.password);
+		//var user = $localStorage.getUserData();
+		//if ( user === null || user === '' || (typeof user === 'undefined') )
+		//	return;
+		//_this.setUser( user );
+		//(function(username, password) {
+		//	_this.getAccessToken(username, password).then(function(data) {
+		//		if ( typeof data.error === 'undefined' )
+		//			$localStorage.set('lastLogin', (new Date()).getTime(), false);
+		//	});
+		//})(user.username, user.password);
 	}
 
 	this.setUser = function(user)
@@ -111,10 +109,10 @@ services.service("$auth", function($http, $q, $state, $localStorage) {
 			_this.password = password;
 			
 
-			$localStorage.setUserData({
-				'username' : username,
-				'password' : password
-			});
+			//$localStorage.setUserData({
+			//	'username' : username,
+			//	'password' : password
+			//});
 
 			//$formsApi.setToken( _this.token );
 

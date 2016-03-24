@@ -14,6 +14,8 @@ controllers.controller('LoginCtrl', function($scope, $formsAPI, $ionicLoading, $
 	$scope.invalidForm = false;
 	$scope.formMessage = '';
 
+	$scope.data = '';
+
 	$scope.proccedLogin = function()
 	{
 		var user = $scope.user;
@@ -24,20 +26,21 @@ controllers.controller('LoginCtrl', function($scope, $formsAPI, $ionicLoading, $
 		}
 		else
 		{
-			$ionicLoading.show({
-				'template' : 'Cargando...'
-			});
+			//$ionicLoading.show({
+			//	'template' : 'Cargando...'
+			//});
 			$scope.invalidForm = false;
 			$formsAPI.getAccessToken(user.username, user.password).
 			then(function (data) {
-				$ionicLoading.hide();
-				if ( typeof data.error === 'undefined' )
-					$state.go('app.home');
-				else
-					(function () {
-						$scope.formMessage = 'Las credenciales introducidas son invalidas.';
-						$scope.invalidForm = true;
-					})();
+				$scope.data = data;
+				//$ionicLoading.hide();
+				//if ( typeof data.error === 'undefined' )
+				//	$state.go('app.home');
+				//else
+				//	(function () {
+				//		$scope.formMessage = 'Las credenciales introducidas son invalidas.';
+				//		$scope.invalidForm = true;
+				//	})();
 			});
 		}
 	}

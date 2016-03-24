@@ -2,7 +2,7 @@ services.service("$formsAPI", function($http, $q, $auth) {
 
 	var _this = this;
 
-	this.baseURL = 'http://192.168.254.3';
+	this.baseURL = 'http://forms-api.cnexans.com';
 	this.token = null;
 
 	
