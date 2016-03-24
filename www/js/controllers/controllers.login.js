@@ -1,7 +1,3 @@
-var controllers = angular.module('starter.controllers', []);
-controllers.controller('AppCtrl', function($scope) {
-  console.log('app ctrl');
-})
 
 
 controllers.controller('LoginCtrl', function($scope, $formsAPI, $ionicLoading, $state)

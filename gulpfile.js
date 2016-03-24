@@ -6,9 +6,12 @@ var sass = require('gulp-sass');
 var minifyCss = require('gulp-minify-css');
 var rename = require('gulp-rename');
 var sh = require('shelljs');
+var order = require('gulp-order');
 
 var paths = {
-  sass: ['./scss/**/*.scss']
+  sass        : ['./scss/**/*.scss'],
+  controllers : ['./www/js/controllers/**/*.def.js', './www/js/controllers/**/*.js'],
+  services : ['./www/js/services/**/*.def.js', './www/js/services/**/*.js']
 };
 
 gulp.task('default', ['sass']);
@@ -48,4 +51,24 @@ gulp.task('git-check', function(done) {
     process.exit(1);
   }
   done();
+});
+
+
+
+gulp.task('services', function() {
+  gulp.src(paths.services)
+    .pipe(concat('services.js'))
+    .pipe(gulp.dest('./www/js/'))
+});
+
+
+gulp.task('controllers', function() {
+  gulp.src(paths.controllers)
+    .pipe(concat('controllers.js'))
+    .pipe(gulp.dest('./www/js/'))
+});
+
+
+gulp.task('js', ['controllers', 'services'], function() {
+    // task 'one' is done now
 });
