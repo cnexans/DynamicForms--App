@@ -3,7 +3,15 @@
   <ion-header-bar class="bar-stable">
     <h1 class="title">Indentifiquese</h1>
   </ion-header-bar>
-  <ion-content>
+  <ion-content overflow-scroll="false">
+
+    <div class="card" ng-show="invalidForm">
+      <div class="item item-text-wrap">
+        {{ formMessage }}
+      </div>
+    </div>
+
+
     <div class="list">
       <label class="item item-input">
         <input type="text" placeholder="E-mail" ng-model="user.username">
@@ -13,16 +21,11 @@
       </label>
     </div>
 
-    <button class="button button-positive col" ng-click="proccedLogin()">
-      Entrar
-    </button>
-
-    <div>
-      {{data}}
+    <div class="row responsive-sm">
+      <button class="button button-positive col" ng-click="proccedLogin()">
+        Entrar
+      </button>
     </div>
   </ion-content>
 
-  <ion-footer-bar align-title="center" class="bar-assertive" ng-show="invalidForm">
-    <h1 class="title">{{ formMessage }}</h1>
-  </ion-footer-bar>
 </ion-pane>

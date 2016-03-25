@@ -1,4 +1,4 @@
-services.service("$auth", function($http, $q, $state, $localStorage) {
+services.service("$auth", function($http, $q, $state, $localStorage, $connection) {
 
 	this.tokenTime    = null;
 	this.lastToken    = null;
@@ -6,27 +6,50 @@ services.service("$auth", function($http, $q, $state, $localStorage) {
 	this.clientId     = 'testclient';
 	this.clientSecret = 'testpass';
 
-	this.userLevel    = null;
-	this.password     = null;
+	this.userLevel = null;
+	this.password  = null;
+	this.baseURL   = null;
+	this.ready     = $q.defer();
 
-
-	this.baseURL = null;
-
-	this.boot = function()
+	this.isReady = function()
 	{
 		var _this = this;
 
+		return _this.ready.promise;
+	}
 
-		//var user = $localStorage.getUserData();
-		//if ( user === null || user === '' || (typeof user === 'undefined') )
-		//	return;
-		//_this.setUser( user );
-		//(function(username, password) {
-		//	_this.getAccessToken(username, password).then(function(data) {
-		//		if ( typeof data.error === 'undefined' )
-		//			$localStorage.set('lastLogin', (new Date()).getTime(), false);
-		//	});
-		//})(user.username, user.password);
+	this.boot = function()
+	{
+		var _this    = this; 
+		var deferred = $q.defer();
+
+
+		var user = $localStorage.getUserData();
+
+		console.log('Cargando datos desde local storage');
+		console.log(user);
+
+		if ( (typeof user.username === 'undefined') || (typeof user.password === 'undefined') )
+		{
+			deferred.resolve({
+				error   : -2,
+				message : 'No hay usuario en el dispositivo'
+			});
+		}
+		else
+		{
+			_this.setUser(user);
+			$connection.connectionState().then(function (data) {
+				if ( data.error != 'undefined' )
+					_this.getAccessToken(user.username, user.password).then(function(data) {
+						deferred.resolve(user);
+					});
+			});
+
+		}
+
+		this.ready.resolve(true);
+		return deferred.promise;
 	}
 
 	this.setUser = function(user)
@@ -68,11 +91,25 @@ services.service("$auth", function($http, $q, $state, $localStorage) {
 	this.isLogged = function()
 	{
 		var _this = this;
+		var _conn = false;
+
+		(function () {
+			return $connection.connectionState().then(function (data) {
+				if ( data.error != 'undefined' )
+					return _conn = false;
+				else
+					return (_conn = true)
+			});
+		})();
+
+		if ( !_conn && _this.username != null && _this.password != null )
+			return true;
+
 
 		if ( (_this.lastToken === null) || (_this.tokenTime === null) )
 			return false;
 
-		var rt = (new Date()).getTime() - (_this.lastToken) < (_this.tokenTime);
+		var rt = (new Date()).getTime()/1000 - (_this.lastToken) < (_this.tokenTime);
 
 		return rt;
 
@@ -86,6 +123,16 @@ services.service("$auth", function($http, $q, $state, $localStorage) {
 
 		if ( _this.isLogged() )
 			deferred.resolve( _this.token );
+
+
+		console.log('Estatus de la conexion en el boot de auth');
+		console.log($connection.hookConnection());
+		console.log('Valor de la respuesta posible')
+		console.log($connection.connectionState());
+		if ( !$connection.hookConnection() )
+		{
+			return $connection.connectionState()
+		}
 
 		$http({
 			method : 'POST',
@@ -101,30 +148,41 @@ services.service("$auth", function($http, $q, $state, $localStorage) {
 		// Success
 		function (response)
 		{
+
+			console.log (response);
+
 			_this.token     = response.data.access_token;
 			_this.tokenTime = response.data.expires_in;
-			_this.lastToken = (new Date()).getTime()*1000;
+			_this.lastToken = (new Date()).getTime()/1000;
 
 			_this.userName = username;
 			_this.password = password;
 			
 
-			//$localStorage.setUserData({
-			//	'username' : username,
-			//	'password' : password
-			//});
+			$localStorage.setUserData({
+				'username' : username,
+				'password' : password
+			});
 
-			//$formsApi.setToken( _this.token );
+			_this.setUser({
+				'username' : username,
+				'password' : password
+			});
 
 			deferred.resolve( _this.token );
 		},
 		// Error
 		function (error)
 		{
-			deferred.resolve({
-				'error'   : true,
-				'message' : error.data.error_description
-			})
+			console.log(error);
+
+			if ( (typeof error.data != 'undefined') && error.data != null )
+				deferred.resolve({
+					'error'   : true,
+					'message' : error.data.error_description
+				});
+			else
+				deferred.resolve(error);
 		});
 
 		return deferred.promise;
@@ -134,7 +192,15 @@ services.service("$auth", function($http, $q, $state, $localStorage) {
 	{
 		var _this = this;
 
-		return _this.updateTokenIfNeeded();
+		(function () {
+			return _this.isReady().then(function (data) {
+				return _this.updateTokenIfNeeded();
+			});
+		})();
+
+
+		return _this.token;
+
 	}
 
 });

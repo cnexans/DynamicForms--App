@@ -1,6 +1,6 @@
 
 
-controllers.controller('LoginCtrl', function($scope, $formsAPI, $ionicLoading, $state)
+controllers.controller('LoginCtrl', function($scope, $formsAPI, $ionicLoading, $state, $http)
 {
 	$scope.user = {
 		username   : '',
@@ -9,8 +9,6 @@ controllers.controller('LoginCtrl', function($scope, $formsAPI, $ionicLoading, $
 
 	$scope.invalidForm = false;
 	$scope.formMessage = '';
-
-	$scope.data = '';
 
 	$scope.proccedLogin = function()
 	{
@@ -22,21 +20,26 @@ controllers.controller('LoginCtrl', function($scope, $formsAPI, $ionicLoading, $
 		}
 		else
 		{
-			//$ionicLoading.show({
-			//	'template' : 'Cargando...'
-			//});
+			$ionicLoading.show({
+				'template' : '<ion-spinner></ion-spinner>'
+			});
 			$scope.invalidForm = false;
 			$formsAPI.getAccessToken(user.username, user.password).
 			then(function (data) {
-				$scope.data = data;
-				//$ionicLoading.hide();
-				//if ( typeof data.error === 'undefined' )
-				//	$state.go('app.home');
-				//else
-				//	(function () {
-				//		$scope.formMessage = 'Las credenciales introducidas son invalidas.';
-				//		$scope.invalidForm = true;
-				//	})();
+				$ionicLoading.hide();
+				if ( typeof data.error === 'undefined' )
+				{
+					$state.go('app.home');
+				}
+				else
+				{
+					$scope.invalidForm = true;
+					if (data.error == -1)
+						$scope.formMessage = 'No hay conexion :(';
+					else
+						$scope.formMessage = 'Las credenciales son invalidas';
+						
+				}
 			});
 		}
 	}

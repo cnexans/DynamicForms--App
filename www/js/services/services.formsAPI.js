@@ -1,4 +1,4 @@
-services.service("$formsAPI", function($http, $q, $auth) {
+services.service("$formsAPI", function($http, $q, $auth, $connection) {
 
 	var _this = this;
 
@@ -8,17 +8,20 @@ services.service("$formsAPI", function($http, $q, $auth) {
 	
 
 	this.fieldTypeNames = {
-		"STRING"       : 'Campo de texto corto, menos de 255 caracteres.',
-        "TEXT"         : 'Campo de texto largo.',
+		"STRING"       : 'Campo de texto corto, menos de 255 caracteres.', // ready
+        "TEXT"         : 'Campo de texto largo.', //ready
         "PHOTO"        : 'Foto',
         "CANVAS_PHOTO" : 'Foto con dibujo o firma',
-        "NUMBER"       : 'Campo numerico',
-        "RATING"       : 'Rating',
-        "OPTION"       : 'Seleccion de opciones',
+        "NUMBER"       : 'Campo numerico', //ready
+        "RATING"       : 'Rating', //ready
+        "OPTION"       : 'Seleccion de opciones', // ready
         "QR_CODE"      : 'Lectura de codigo QR',
         "LOCATION"     : 'Posicion de GPS',
-        "DATE"         : 'Campo de fecha'
+        "DATE"         : 'Campo de fecha' // ready
 	}
+
+
+	// las transacciones con el servidor devuelven error:-1 cuando no hay internet
 
 
 	this.boot = function()
@@ -33,6 +36,11 @@ services.service("$formsAPI", function($http, $q, $auth) {
 	{
 		var _this = this;
 		var deferred = $q.defer();
+
+		if ( !$connection.hookConnection() )
+		{
+			return $connection.connectionState()
+		}
 
 		$http({
 			method : 'POST',
@@ -55,17 +63,21 @@ services.service("$formsAPI", function($http, $q, $auth) {
 	}
 
 
-	this.formsOfUser = function(id)
+	this.myForms = function()
 	{
 		var _this = this;
 		var deferred = $q.defer();
 
+		if ( !$connection.hookConnection() )
+		{
+			return $connection.connectionState();
+		}
+
+		console.log ( $auth.getToken() );
+
 		$http({
 			method : 'POST',
-			url    : _this.baseURL + '/user/forms?access_token=' + $auth.getToken(),
-			data   : {
-				'requested_user_id' : id
-			}
+			url    : _this.baseURL + '/user/me/my-forms?access_token=' + $auth.getToken(),
 		}).then(
 		// Success
 		function (response)
@@ -82,11 +94,51 @@ services.service("$formsAPI", function($http, $q, $auth) {
 		return deferred.promise;
 	}
 
+	this.myFormStructure = function(id)
+	{
+		var _this = this;
+		var deferred = $q.defer();
+
+		if ( !$connection.hookConnection() )
+		{
+			return $connection.connectionState()
+		}
+
+		$http({
+			method : 'POST',
+			url    : _this.baseURL + '/user/me/my-form-structure?access_token=' + $auth.getToken(),
+			data   : {
+				'form_id' : id
+			}
+		}).then(
+		// Success
+		function (response)
+		{
+			deferred.resolve({
+				'form_id'   : id,
+				'structure' : response.data
+			});
+		},
+		// Failure
+		function (error)
+		{
+			deferred.resolve(error.data);
+
+		});
+
+		return deferred.promise;
+	}
+
 
 	this.myProfile = function()
 	{
 		var _this = this;
 		var deferred = $q.defer();
+
+		if ( !$connection.hookConnection() )
+		{
+			return $connection.connectionState()
+		}
 
 		$http({
 			method : 'POST',
@@ -121,6 +173,14 @@ services.service("$formsAPI", function($http, $q, $auth) {
 
 	this.getAccessToken = function(username, password)
 	{
+		console.log('Que sucede con la conexion?');
+		console.log($connection.hookConnection());
+
+		if ( !$connection.hookConnection() )
+		{
+			return $connection.connectionState();
+		}
+
 		return $auth.getAccessToken(username, password);
 	}
 

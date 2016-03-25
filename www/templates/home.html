@@ -1,11 +1,21 @@
-<ion-view view-title="Home">
-	<ion-content>
+<ion-view view-title="Mis formularios">
+	<ion-content overflow-scroll="false">
+
+		<div class="card" ng-show="stateInfo != ''">
+			<div class="item item-text-wrap">
+				{{ stateInfo }}
+			</div>
+		</div>
+
+		<div class="row responsive-sm">
+		    <button class="button button-positive col" ng-click="updateDataFromServer()">
+		     	Actualizar
+		    </button>
+		</div>
+
 		<ul class="list">
-		    <li class="item">
-				Lista
-		    </li>
-		    <li class="item">
-				Lista 2
+		    <li class="item" ng-repeat="form in forms" ui-sref="app.answer({formId: form.id})">
+				{{ form.name }}
 		    </li>
 		</ul>
 	</ion-content>

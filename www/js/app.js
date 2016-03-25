@@ -4,31 +4,25 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 // 'starter.controllers' is found in controllers.js
-angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
+angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', 'starter.directives'])
 
-.run(function($ionicPlatform, $rootScope, $auth, $location, $formsAPI, $ionicPopup) {
+.run(function($ionicPlatform, $rootScope, $auth, $formsAPI, $connection) {
   $ionicPlatform.ready(function() {
-	// Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
-	// for form inputs)
-	//if (window.cordova && window.cordova.plugins.Keyboard) {
-	  //cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
-	  //cordova.plugins.Keyboard.disableScroll(true);
 
-	//}
-	//if (window.StatusBar) {
-	  // org.apache.cordova.statusbar required
-	  //StatusBar.styleDefault();
-	//}
 
-	$formsAPI.boot();
-	$auth.boot();
+    $connection.boot();
 
-  $ionicPopup.alert({
-    title: 'Don\'t eat that!',
-    template: 'It might taste good'
-   });
+    document.addEventListener("offline", function () {
+      $connection.noInternet();
+    }, false);
 
-	console.log('Hizo boot');
+
+    document.addEventListener("online", function () {
+      $connection.hasInternet();
+    }, false);
+
+
+
 
   });
 })
@@ -46,10 +40,13 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
 	abstract: true,
 	templateUrl: 'templates/menu.html',
 	controller: 'AppCtrl',
-    onEnter: function($state, $auth) {
-        if(!$auth.isLogged()){
-           $state.go('login');
-        }
+    onEnter: function($state, $auth, $formsAPI) {
+        $formsAPI.boot();
+        $auth.boot().then(function () {
+          if( !$auth.isLogged() ) {
+            $state.go('login');
+          }
+        });
     }
   })
 
@@ -64,8 +61,18 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
 	url: '/home',
     views: {
       'menuContent': {
-        templateUrl: 'templates/home.html'//,
-        //controller: 'LoginCtrl'
+        templateUrl: 'templates/home.html',
+        controller: 'HomeCtrl'
+      }
+    }
+  })
+
+  .state('app.answer', {
+  url: '/answer/:formId',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/answer.html',
+        controller: 'AnswerCtrl'
       }
     }
   })

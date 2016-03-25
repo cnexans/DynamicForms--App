@@ -23,6 +23,8 @@ services.service("$localStorage", function($http, $q, $state) {
 
 		else
 			window.localStorage.setItem(index, value);
+
+		return value;
 	}
 
 
@@ -46,15 +48,78 @@ services.service("$localStorage", function($http, $q, $state) {
 
 	/*=====  End of Local Storage Interface  ======*/
 
+	this.resetIndex = function(index)
+	{
+		var _this = this;
+
+
+		_this.set(index, []);
+
+		return [];
+	}
+
 
 	this.getUserData = function()
 	{
-		return JSON.parse( window.localStorage.getItem('userdata') );
+		var _this = this;
+		var user = _this.get('userData');
+
+		if ( user == null || user == '' || (typeof user === 'undefined') )
+			return _this.setUserData({})
+
+		return user;
 	}
 
 	this.setUserData = function(data)
 	{
-		this.set('userdata', data);
+		var _this = this;
+
+		_this.set('userData', data);
+
+
+		return data;
+	}
+
+
+	this.getForms = function()
+	{
+
+		var _this = this;
+		var forms = _this.get('userForms');
+
+		if ( forms == null || forms == '' || (typeof forms === 'undefined') )
+			return _this.resetIndex('userForms');
+
+		return forms;
+
+	}
+
+	this.saveForms = function(formsObj)
+	{
+
+		var _this = this;
+
+		return _this.set('userForms', formsObj);
+
+	}
+
+
+	this.saveFormStructure = function(data)
+	{
+		var _this = this;
+
+		return _this.set('formStructure', data);
+	}
+
+	this.getFormStructures = function()
+	{
+		var _this = this;
+		var forms = _this.get('formStructure');
+
+		if ( forms == null || forms == '' || (typeof forms === 'undefined') )
+			return _this.resetIndex('formStructure');
+
+		return forms;
 	}
 
 });

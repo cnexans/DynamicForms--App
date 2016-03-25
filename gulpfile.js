@@ -11,7 +11,8 @@ var order = require('gulp-order');
 var paths = {
   sass        : ['./scss/**/*.scss'],
   controllers : ['./www/js/controllers/**/*.def.js', './www/js/controllers/**/*.js'],
-  services : ['./www/js/services/**/*.def.js', './www/js/services/**/*.js']
+  services : ['./www/js/services/**/*.def.js', './www/js/services/**/*.js'],
+  directives : ['./www/js/directives/**/*.def.js', './www/js/directives/**/*.js']
 };
 
 gulp.task('default', ['sass']);
@@ -69,6 +70,13 @@ gulp.task('controllers', function() {
 });
 
 
-gulp.task('js', ['controllers', 'services'], function() {
-    // task 'one' is done now
+gulp.task('directives', function() {
+  gulp.src(paths.directives)
+    .pipe(concat('directives.js'))
+    .pipe(gulp.dest('./www/js/'))
+});
+
+
+gulp.task('js', ['controllers', 'services', 'directives'], function() {
+
 });

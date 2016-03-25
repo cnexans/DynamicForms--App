@@ -1,0 +1,15 @@
+<ion-view view-title="Responder">
+	<ion-content overflow-scroll="false">
+		<div class="card" ng-show="stateInfo != ''">
+			<div class="item item-text-wrap">
+				{{ stateInfo }}
+			</div>
+		</div>
+
+		<ul class="list">
+		    <div ng-repeat="field in fields">
+				<field data="field"></field>
+			</div>
+		</ul>
+	</ion-content>
+</ion-view>

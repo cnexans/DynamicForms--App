@@ -1,0 +1,43 @@
+
+<div class="item item-divider item-button-right">
+	{{ data.label }}
+	<button class="button button-positive" ng-click="showHelp(data.question)">
+		<i class="icon ion-help"></i>
+	</button>
+</div>
+
+<label class="item item-input" ng-if="data.type == 'STRING'">
+	<input type="text" placeholder="Texto corto" ng-model="data.value">
+</label>
+
+
+<label class="item item-input" ng-if="data.type == 'NUMBER'">
+	<input type="number" step="any" placeholder="Numero" ng-model="data.value"/>
+</label>
+
+<label class="item item-input" ng-if="data.type == 'TEXT'">
+	<textarea placeholder="Texto largo" ng-model="data.value"></textarea>
+</label>
+
+<label class="item item-input item-select" ng-if="data.type == 'OPTION'">
+	<div class="input-label">
+		Escoger
+	</div>
+	<select>
+		<option ng-repeat="option in data.options" value="option.id">{{ option.display_option }}</option>
+	</select>
+</label>
+
+
+<label class="item item-input" ng-if="data.type == 'DATE'">
+	<span class="input-label">Escoger fecha</span>
+	<input type="date" placeholder="Fecha" ng-model="data.value">
+</label>
+
+
+<div class="item range" ng-if="data.type == 'RATING'">
+	<i class="icon ion-close-circle"></i>
+	<input type="range" ng-model="data.value" min="0" max="10">
+	<i class="icon ion-checkmark-circled"></i>
+</div>
+
