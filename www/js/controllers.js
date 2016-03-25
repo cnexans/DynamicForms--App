@@ -14,6 +14,9 @@ function($scope, $formsAPI, $localStorage, $auth, $ionicLoading, $stateParams)
 
 	angular.forEach(fields[i].structure, function(value) {
 		var fieldObj = {
+			//Id del field descriptor, lo necesitaremos para enviar la respuesta..!
+			field_descriptor_id : value.id,
+
 			type     : value.type,
 			label    : value.label,
 			question : value.question

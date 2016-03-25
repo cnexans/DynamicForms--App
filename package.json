@@ -18,7 +18,12 @@
   "cordovaPlugins": [
     "cordova-plugin-console",
     "cordova-plugin-whitelist",
-    "cordova-plugin-network-information"
+    "cordova-plugin-network-information",
+    "cordova-plugin-geolocation",
+    "cordova-plugin-barcodescanner",
+    "cordova-plugin-file",
+    "cordova-plugin-file-transfer",
+    "cordova-plugin-camera"
   ],
   "cordovaPlatforms": [
     "ios",

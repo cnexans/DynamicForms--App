@@ -315,7 +315,7 @@ services.service("$formsAPI", function($http, $q, $auth, $connection) {
         "RATING"       : 'Rating', //ready
         "OPTION"       : 'Seleccion de opciones', // ready
         "QR_CODE"      : 'Lectura de codigo QR',
-        "LOCATION"     : 'Posicion de GPS',
+        "LOCATION"     : 'Posicion de GPS', //ready
         "DATE"         : 'Campo de fecha' // ready
 	}
 
