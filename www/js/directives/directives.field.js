@@ -8,6 +8,8 @@ directives.directive('field', function() {
 		controller  : function($scope, $ionicPopup, $ionicPlatform, $cordovaGeolocation) {
 			
 
+			console.log('Desde la directiva field')
+
 			// Initializations
 			$scope.loadingGeolocation = false;
 
@@ -18,32 +20,38 @@ directives.directive('field', function() {
 				});
 			}
 
-			function getLocation()
+			$scope.getLocation = function()
 			{
-				$ionicPlatform.ready(function() {
-					$scope.loadingGeolocation = true;
-					var options = {
-						frequency : 15 * 60 * 1000,
-						timeout   : 1 * 60 * 1000,
-						maximumAge: 5000,
-						enableHighAccuracy: true
-					};
-					$cordovaGeolocation
-					.getCurrentPosition(options)
-					.then(function (position) {
-						$scope.data.lat  = position.coords.latitude;
-						$scope.data.lng  = position.coords.longitude;
-						$scope.loadingGeolocation = false;
-					}, function(err) {
-						console.log(err);
-						$scope.loadingGeolocation = false;
-						$ionicPopup.alert({
-							title: 'Error',
-							template: 'El sistema ha bloqueado el uso de GPS. Estatus ' + erro.code
-						});
+				console.log('Hizo click en el boton')
+				
+				$scope.loadingGeolocation = true;
+				var options = {
+					frequency : 15 * 60 * 1000,
+					timeout   : 1 * 60 * 1000,
+					maximumAge: 5000,
+					enableHighAccuracy: true
+				};
+				$cordovaGeolocation
+				.getCurrentPosition(options)
+				.then(function (position) {
+					$scope.data.lat  = position.coords.latitude;
+					$scope.data.lng  = position.coords.longitude;
+					$scope.loadingGeolocation = false;
+				}, function(err) {
+					console.log(err);
+					$scope.loadingGeolocation = false;
+					$ionicPopup.alert({
+						title: 'Error',
+						template: 'El sistema ha bloqueado el uso de GPS. Estatus ' + erro.code
 					});
 				});
+				
 			}
+
+			if ($scope.data.type == 'LOCATION')
+				$ionicPlatform.ready(function() {
+					$scope.getLocation();
+				});
 
 
 

@@ -26,6 +26,11 @@ function($scope, $formsAPI, $localStorage, $auth, $ionicLoading, $stateParams)
 		$scope.fields.push(fieldObj);
 	});
 
+	$scope.sendAnswer = function()
+	{
+		console.log($scope.fields);
+	}
+
 });
 controllers.controller('AppCtrl', function($scope) {
 	// Controller general
