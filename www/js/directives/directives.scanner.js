@@ -14,7 +14,7 @@ directives.directive('qrScanner', function() {
 				.then(function(barcodeData) {
 					// Success! Barcode data is here
 					$scope.data.value = barcodeData.text;
-					$scope.codeScanned = false;
+					$scope.codeScanned = true;
 					console.log(barcodeData);
 				}, function(error) {
 					$ionicPopup.alert({
