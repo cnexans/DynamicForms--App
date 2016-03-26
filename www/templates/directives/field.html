@@ -36,31 +36,21 @@
 
 
 <div class="item range" ng-if="data.type == 'RATING'">
-	<i class="icon ion-close-circle"></i>
+	<i class="icon ion-close-circled"></i>
 	<input type="range" ng-model="data.value" min="0" max="10">
 	<i class="icon ion-checkmark-circled"></i>
 </div>
 
 
 <div ng-if="data.type == 'LOCATION'">
-	<div class="item" ng-show="loadingGeolocation">
-		<button class="button button-full button-light">
-			<ion-spinner></ion-spinner>
-		</button>
-	</div>
-	<label class="item item-input">
-		<span class="input-label">Latitud</span>
-		<input type="text" ng-model="data.lat" disabled>
-	</label>
-	<label class="item item-input">
-		<span class="input-label">Longitud</span>
-		<input type="text" ng-model="data.lng" disabled>
-	</label>
-	<button class="button button-full button-positive" ng-click="getLocation()">
-		Actualizar posicion
-	</button>
+	<current-location data="data"></current-location>
 </div>
 
 <div ng-if="data.type == 'PHOTO'">
 	<take-photo data="data"></take-photo>
+</div>
+
+
+<div ng-if="data.type == 'QR_CODE'">
+	<qr-scanner data="data"></qr-scanner>
 </div>

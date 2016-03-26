@@ -1,14 +1,4 @@
 var services = angular.module('starter.services', []);
-services.service("$appProvider", function($cordovaFile) {
-
-	this.fileSystem = null;
-
-	this.boot = function()
-	{
-		
-	}
-
-});
 services.service("$auth", function($http, $q, $state, $localStorage, $connection) {
 
 	this.tokenTime    = null;

@@ -1,0 +1,16 @@
+<div class="item" ng-show="loadingGeolocation">
+	<button class="button button-full button-light">
+		<ion-spinner></ion-spinner>
+	</button>
+</div>
+<label class="item item-input">
+	<span class="input-label">Latitud</span>
+	<input type="text" ng-model="data.lat" disabled>
+</label>
+<label class="item item-input">
+	<span class="input-label">Longitud</span>
+	<input type="text" ng-model="data.lng" disabled>
+</label>
+<button class="button button-full button-positive" ng-click="getLocation()">
+	Actualizar posicion
+</button>

@@ -27,7 +27,11 @@ directives.directive('takePhoto', function() {
 			    	console.log(fileUri);
 			    	$scope.data.value = fileUri;
 			    }, function(err) {
-			    	console.log(err)
+			    	console.log(err);
+					$ionicPopup.alert({
+						title: 'Error',
+						template: 'Hubo un error en la captura de la imagen.'
+					});
 			    });
 			}
 
