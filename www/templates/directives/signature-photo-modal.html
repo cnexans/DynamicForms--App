@@ -1,12 +1,17 @@
 <ion-modal-view> 
+	<ion-header-bar class="bar-positive" align-title="center">
+		<h1 class="title">Foto con anotacion</h1>
+	</ion-header-bar>
 
-	<div  class="m-signature-pad">
-		<div class="m-signature-pad--body">
-			<canvas id="signature-pad" width='400' height='400' style='border: 1px solid black;'></canvas>
+	<ion-content>
+		<div class="row">
+			<div id="signature-pad-wrapper" class="col col-80 col-offset-10">
+				<canvas id="signature-pad" width='400' height='400' style='border: 1px solid #444;'></canvas>
+			</div>
 		</div>
 
-		<div class="description">Sign above</div>
-		<button class="button clear" data-action="clear" ng-click="clearPSign()">Clear</button>
-		<button class="button save" data-action="save" ng-click="savePSign()">Save</button> 
-	</div>		
+	<button class="button button-full button-positive" ng-click="savePSign()">
+		Guardar
+	</button>
+	</ion-content>	
 </ion-modal-view>

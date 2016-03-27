@@ -13,7 +13,7 @@ directives.directive('takePhoto', function() {
 			{
 				console.log('Hizo click en el boton')
 				var options = {
-					quality            : 50,
+					quality            : 80,
 					destinationType    : Camera.DestinationType.FILE_URI,
 					sourceType         : Camera.PictureSourceType.CAMERA,
 					allowEdit          : true,
