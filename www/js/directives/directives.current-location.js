@@ -10,6 +10,9 @@ directives.directive('currentLocation', function() {
 			// Inicializacion
 			$scope.loadingGeolocation = false;
 
+			$scope.data.lat = '';
+			$scope.data.lng = '';
+
 			// Funcion para obtener la posicion actual
 			$scope.getLocation = function()
 			{
@@ -39,6 +42,14 @@ directives.directive('currentLocation', function() {
 				});
 				
 			}
+
+			$scope.data.valid = function()
+			{
+				var _valid = ($scope.data.lat != '') && ($scope.data.lng != '')
+				return _valid;
+			}
+
+
 
 			// Al entrar...
 			$ionicPlatform.ready(function() {

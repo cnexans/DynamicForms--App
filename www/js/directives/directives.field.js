@@ -13,6 +13,21 @@ directives.directive('field', function() {
 				});
 			}
 
+			if ( $scope.data.type != 'LOCATION' )
+			{
+				$scope.data.valid = function()
+				{
+					return $scope.data.value != '';
+				}
+
+				$scope.data.value = '';
+			}
+
+			if ( $scope.data.type != 'OPTION' )
+			{
+				$scope.data.value = $scope.data.options[0].id;
+			}
+
 		}
 	}
 });
