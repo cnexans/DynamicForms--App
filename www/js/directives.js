@@ -85,6 +85,11 @@ directives.directive('field', function() {
 				$scope.data.value = '';
 			}
 
+			if ( $scope.data.type == 'OPTION' )
+			{
+				$scope.data.value = $scope.data.options[0].id;
+			}
+
 		}
 	}
 });

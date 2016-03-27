@@ -1,6 +1,6 @@
 var controllers = angular.module('starter.controllers', []);
 controllers.controller('AnswerCtrl', 
-function($scope, $formsAPI, $localStorage, $auth, $ionicLoading, $stateParams, $q, $ionicPopup)
+function($scope, $formsAPI, $localStorage, $auth, $ionicLoading, $stateParams, $q, $ionicPopup, $state)
 {
 	$scope.stateInfo = '';
 	$scope.formId = $stateParams.formId;
@@ -16,7 +16,6 @@ function($scope, $formsAPI, $localStorage, $auth, $ionicLoading, $stateParams, $
 		var fieldObj = {
 			//Id del field descriptor, lo necesitaremos para enviar la respuesta..!
 			field_descriptor_id : value.id,
-
 			type     : value.type,
 			label    : value.label,
 			question : value.question
@@ -33,7 +32,6 @@ function($scope, $formsAPI, $localStorage, $auth, $ionicLoading, $stateParams, $
 		angular.forEach($scope.fields, function (field, k) {
 			var deferred = $q.defer();
 			validity = validity && field.valid();
-			console.log(field.valid());
 			deferred.resolve({
 				'id'    : k,
 				'valid' : field.valid()
@@ -42,25 +40,101 @@ function($scope, $formsAPI, $localStorage, $auth, $ionicLoading, $stateParams, $
 		});
 
 		$q.all(promises).then(function (fieldValidities) {
-			console.log($scope.fields)
-			console.log(fieldValidities)
-			console.log(validity)
 			if ( !validity )
+			{
 				$ionicPopup.alert({
 					title: 'Ups',
 					template: 'Alguno de los campos esta vacio, no olvide responderlo!'
 				});
+			}
 			else
+			{
+				$localStorage.registerAnswer({
+					'form_id' : $scope.formId,
+					'answers' : $scope.fields
+				});
 				$ionicPopup.alert({
 					title: 'Correcto',
-					template: 'Todos los campos estan llenos'
+					template: 'Se han guardado los datos, puede enviar las respuestas mediante el menu principal.'
+				}).then(function() {
+					$state.go('app.home');
 				});
+			}
 		})
 	}
 
 });
-controllers.controller('AppCtrl', function($scope) {
-	// Controller general
+controllers.controller('AppCtrl', function($scope, $localStorage, $formsAPI, $q, $ionicLoading, $auth) {
+
+	$scope.unorderedFields = [];
+
+	//Ohstia me cago en la puta XD
+
+	$scope.uploadAnswers = function()
+	{
+		var _answers = $localStorage.getAllAnswers();
+		console.log('Se han cargado respuestas guardadas: ');
+		console.log(_answers);
+
+		if ( _answers.length > 0 )
+		{
+			$ionicLoading.show({
+				'template' : '<ion-spinner></ion-spinner>'
+			});
+
+			$auth.isReady().then(function (status) {
+				$scope.prepareFields(_answers).then(function (e) {
+					$scope.prepareSync();
+				});
+			});
+		}
+	}
+
+	$scope.prepareFields = function(_answers)
+	{
+		var counter = 0;
+		var finish  = $q.defer();
+		angular.forEach(_answers, function(answer) {
+			counter += answer.answers.length;
+			$formsAPI.createFormInstance(answer.form_id).then(function (data) {
+				var instanceId = data.instance_id
+				angular.forEach(answer.answers, function (fieldAnswer) {
+					fieldAnswer.form_instance_id = instanceId;
+					$scope.unorderedFields.push(fieldAnswer);
+
+					if ( counter == $scope.unorderedFields.length )
+						finish.resolve(true);
+				});
+			});
+		});
+
+		return finish.promise;
+	}
+
+
+	$scope.prepareSync = function () {
+		console.log($scope.unorderedFields);
+		$scope.fieldsCount  = $scope.unorderedFields.length;
+		$scope.currentField = 0;
+		$scope.executeSync();
+	};
+
+	$scope.executeSync = function()
+	{
+		$formsAPI.uploadAnswer($scope.unorderedFields[$scope.currentField]).then(function (data) {
+			$scope.currentField++;
+			if ( $scope.currentField < $scope.fieldsCount )
+			{
+				$scope.executeSync();
+			}
+			else
+			{
+				$ionicLoading.hide();
+				$localStorage.resetAnswers();
+			}
+		});
+	}
+
 })
 controllers.controller('HomeCtrl', function($scope, $formsAPI, $localStorage, $connection, $auth, $ionicLoading, $q)
 {

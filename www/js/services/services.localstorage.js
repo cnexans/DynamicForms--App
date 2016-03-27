@@ -122,4 +122,37 @@ services.service("$localStorage", function($http, $q, $state) {
 		return forms;
 	}
 
+	this.registerAnswer = function (dataAnswer)
+	{
+		var _this = this;
+		var answers = _this.get('formAnswers');
+
+		if ( answers == null || answers == '' || (typeof answers === 'undefined') )
+		{
+			answers = _this.resetIndex('formAnswers');
+		}
+
+		answers.push(dataAnswer);
+		_this.set('formAnswers', answers);
+	}
+
+	this.getAllAnswers = function()
+	{
+		var _this = this;
+		var answers = _this.get('formAnswers');
+
+		if ( answers == null || answers == '' || (typeof answers === 'undefined') )
+		{
+			answers = _this.resetIndex('formAnswers');
+		}
+
+		return answers;
+	}
+
+	this.resetAnswers = function()
+	{
+		var _this = this;
+		return _this.resetIndex('formAnswers');
+	}
+
 });

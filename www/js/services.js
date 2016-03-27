@@ -65,23 +65,20 @@ services.service("$auth", function($http, $q, $state, $localStorage, $connection
 	this.updateTokenIfNeeded = function()
 	{
 		var _this = this;
+		var deferred = $q.defer();
 
 		if (_this.isLogged())
-			return _this.token;
+			deferred.resolve(_this.token);
 
-		if ( (_this.username != null && _this.password != null) && !_this.isLogged())
-			return (function()
-			{
-				return _this.getAccessToken(_this.username, _this.password).then(function(response) {
-					_this.token     = response.data.access_token;
-					_this.tokenTime = response.data.expires_in;
-					_this.lastToken = (new Date()).getTime()*1000;
+		else if ( (_this.username != null && _this.password != null) && !_this.isLogged())
+			_this.getAccessToken(_this.username, _this.password).then(function(token) {
+				deferred.resolve(token)
+			});
 
-					return _this.token;
-				});
-			})();
+		else
+			deferred.resolve(false);
 
-		return;
+		return deferred.promise;
 	}
 
 	this.setBaseURL = function(string)
@@ -192,16 +189,7 @@ services.service("$auth", function($http, $q, $state, $localStorage, $connection
 	this.getToken = function()
 	{
 		var _this = this;
-
-		(function () {
-			return _this.isReady().then(function (data) {
-				return _this.updateTokenIfNeeded();
-			});
-		})();
-
-
 		return _this.token;
-
 	}
 
 });
@@ -297,7 +285,7 @@ services.service("$connection", function($http, $q, $state, $interval) {
 
 
 });
-services.service("$formsAPI", function($http, $q, $auth, $connection) {
+services.service("$formsAPI", function($http, $q, $auth, $connection, $cordovaFileTransfer) {
 
 	var _this = this;
 
@@ -341,24 +329,27 @@ services.service("$formsAPI", function($http, $q, $auth, $connection) {
 			return $connection.connectionState()
 		}
 
-		$http({
-			method : 'POST',
-			url    : _this.baseURL + '/user/edit/me?access_token=' + $auth.getToken(),
-			data   : object
-		}).then(
-		// Success
-		function (response)
-		{
-			deferred.resolve(response.data);
-		},
-		// Failure
-		function (error)
-		{
-			deferred.resolve(error.data);
+		$auth.updateTokenIfNeeded().then(function (currentToken) {
+			$http({
+				method : 'POST',
+				url    : _this.baseURL + '/user/edit/me?access_token=' + $auth.getToken(),
+				data   : object
+			}).then(
+			// Success
+			function (response)
+			{
+				deferred.resolve(response.data);
+			},
+			// Failure
+			function (error)
+			{
+				deferred.resolve(error.data);
 
+			});
 		});
 
 		return deferred.promise;
+
 	}
 
 
@@ -372,22 +363,22 @@ services.service("$formsAPI", function($http, $q, $auth, $connection) {
 			return $connection.connectionState();
 		}
 
-		console.log ( $auth.getToken() );
+		$auth.updateTokenIfNeeded().then(function (currentToken) {
+			$http({
+				method : 'POST',
+				url    : _this.baseURL + '/user/me/my-forms?access_token=' + $auth.getToken(),
+			}).then(
+			// Success
+			function (response)
+			{
+				deferred.resolve(response.data);
+			},
+			// Failure
+			function (error)
+			{
+				deferred.resolve(error.data);
 
-		$http({
-			method : 'POST',
-			url    : _this.baseURL + '/user/me/my-forms?access_token=' + $auth.getToken(),
-		}).then(
-		// Success
-		function (response)
-		{
-			deferred.resolve(response.data);
-		},
-		// Failure
-		function (error)
-		{
-			deferred.resolve(error.data);
-
+			});
 		});
 
 		return deferred.promise;
@@ -403,26 +394,28 @@ services.service("$formsAPI", function($http, $q, $auth, $connection) {
 			return $connection.connectionState()
 		}
 
-		$http({
-			method : 'POST',
-			url    : _this.baseURL + '/user/me/my-form-structure?access_token=' + $auth.getToken(),
-			data   : {
-				'form_id' : id
-			}
-		}).then(
-		// Success
-		function (response)
-		{
-			deferred.resolve({
-				'form_id'   : id,
-				'structure' : response.data
-			});
-		},
-		// Failure
-		function (error)
-		{
-			deferred.resolve(error.data);
+		$auth.updateTokenIfNeeded().then(function (currentToken) {
+			$http({
+				method : 'POST',
+				url    : _this.baseURL + '/user/me/my-form-structure?access_token=' + $auth.getToken(),
+				data   : {
+					'form_id' : id
+				}
+			}).then(
+			// Success
+			function (response)
+			{
+				deferred.resolve({
+					'form_id'   : id,
+					'structure' : response.data
+				});
+			},
+			// Failure
+			function (error)
+			{
+				deferred.resolve(error.data);
 
+			});
 		});
 
 		return deferred.promise;
@@ -439,20 +432,22 @@ services.service("$formsAPI", function($http, $q, $auth, $connection) {
 			return $connection.connectionState()
 		}
 
-		$http({
-			method : 'POST',
-			url    : _this.baseURL + '/user/me?access_token=' + $auth.getToken(),
-		}).then(
-		// Success
-		function (response)
-		{
-			deferred.resolve(response.data);
-		},
-		// Failure
-		function (error)
-		{
-			deferred.resolve(error.data);
+		$auth.updateTokenIfNeeded().then(function (currentToken) {
+			$http({
+				method : 'POST',
+				url    : _this.baseURL + '/user/me?access_token=' + $auth.getToken()
+			}).then(
+			// Success
+			function (response)
+			{
+				deferred.resolve(response.data);
+			},
+			// Failure
+			function (error)
+			{
+				deferred.resolve(error.data);
 
+			});
 		});
 
 		return deferred.promise;
@@ -481,6 +476,160 @@ services.service("$formsAPI", function($http, $q, $auth, $connection) {
 		}
 
 		return $auth.getAccessToken(username, password);
+	}
+
+
+	this.uploadAnswer = function (answerData)
+	{
+		var _this    = this;
+		var deferred = $q.defer();
+
+		if ( answerData.type == 'LOCATION')
+			return _this.uploadAnswerLocation(answerData);
+
+		if ( answerData.type == 'PHOTO')
+			return _this.uploadAnswerFile(answerData);
+
+		if ( !$connection.hookConnection() )
+		{
+			return $connection.connectionState()
+		}
+
+
+		$auth.updateTokenIfNeeded().then(function (currentToken) {
+			$http({
+				method : 'POST',
+				url    : _this.baseURL + '/form/instance/register-answer?access_token=' + $auth.getToken(),
+				data   : {
+					'form_instance_id'    : answerData.form_instance_id,
+					'field_descriptor_id' : answerData.field_descriptor_id,
+					'value'               : answerData.value
+				}
+			}).then(
+			// Success
+			function (response)
+			{
+				deferred.resolve(response.data);
+			},
+			// Failure
+			function (error)
+			{
+				deferred.resolve(error.data);
+			});
+		});
+
+
+		return deferred.promise;
+	}
+
+	this.uploadAnswerFile = function(answerData)
+	{
+		var _this    = this;
+		var deferred = $q.defer();
+
+		if ( !$connection.hookConnection() )
+		{
+			return $connection.connectionState()
+		}
+
+		var options           = new FileUploadOptions();
+		options.fileKey       = "value";
+		options.fileName      = answerData.value.substr(answerData.value.lastIndexOf('/')+1);
+		options.mimeType      = "image/jpeg";
+		options.trustAllHosts = true;
+
+		var params                 = new Object();
+		params.field_descriptor_id = answerData.field_descriptor_id;
+		params.form_instance_id    = answerData.form_instance_id;
+
+		options.params      = params;
+		options.chunkedMode = false;
+
+		var server = _this.baseURL + '/form/instance/register-answer?access_token=' + $auth.getToken();
+
+		$auth.updateTokenIfNeeded().then(function (currentToken) {
+			$cordovaFileTransfer.upload(server, answerData.value, options)
+			.then(function(result) {
+				console.log('Se subio correctamente el archivo :D');
+				deferred.resolve(result.data);
+			}, function(err) {
+				console.log('Hubo un error al subir un archivo... :(');
+				console.log(answerData);
+				console.log(err);
+				deferred.resolve(err);
+			});
+		});
+
+		return deferred.promise;
+
+	}
+
+	this.uploadAnswerLocation = function(answerData)
+	{
+		var _this    = this;
+		var deferred = $q.defer();
+		if ( !$connection.hookConnection() )
+		{
+			return $connection.connectionState()
+		}
+
+		$auth.updateTokenIfNeeded().then(function (currentToken) {
+			$http({
+				method : 'POST',
+				url    : _this.baseURL + '/form/instance/register-answer?access_token=' + $auth.getToken(),
+				data   : {
+					'form_instance_id'    : answerData.form_instance_id,
+					'field_descriptor_id' : answerData.field_descriptor_id,
+					'lat'                 : answerData.lat,
+					'lng'                 : answerData.lng
+				}
+			}).then(
+			// Success
+			function (response)
+			{
+				deferred.resolve(response.data);
+			},
+			// Failure
+			function (error)
+			{
+				deferred.resolve(error.data);
+			});
+		});
+
+		return deferred.promise;
+	}
+
+	this.createFormInstance = function(formId)
+	{
+		var _this    = this;
+		var deferred = $q.defer();
+
+		if ( !$connection.hookConnection() )
+		{
+			return $connection.connectionState()
+		}
+
+		$auth.updateTokenIfNeeded().then(function (currentToken) {
+			$http({
+				method : 'POST',
+				url    : _this.baseURL + '/form/instance/create?access_token=' + $auth.getToken(),
+				data   : {
+					'form_id' : formId
+				}
+			}).then(
+			// Success
+			function (response)
+			{
+				deferred.resolve(response.data);
+			},
+			// Failure
+			function (error)
+			{
+				deferred.resolve(error.data);
+			});
+		});
+
+		return deferred.promise;
 	}
 
 
@@ -608,6 +757,39 @@ services.service("$localStorage", function($http, $q, $state) {
 			return _this.resetIndex('formStructure');
 
 		return forms;
+	}
+
+	this.registerAnswer = function (dataAnswer)
+	{
+		var _this = this;
+		var answers = _this.get('formAnswers');
+
+		if ( answers == null || answers == '' || (typeof answers === 'undefined') )
+		{
+			answers = _this.resetIndex('formAnswers');
+		}
+
+		answers.push(dataAnswer);
+		_this.set('formAnswers', answers);
+	}
+
+	this.getAllAnswers = function()
+	{
+		var _this = this;
+		var answers = _this.get('formAnswers');
+
+		if ( answers == null || answers == '' || (typeof answers === 'undefined') )
+		{
+			answers = _this.resetIndex('formAnswers');
+		}
+
+		return answers;
+	}
+
+	this.resetAnswers = function()
+	{
+		var _this = this;
+		return _this.resetIndex('formAnswers');
 	}
 
 });

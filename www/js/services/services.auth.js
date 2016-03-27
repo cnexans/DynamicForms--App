@@ -64,23 +64,20 @@ services.service("$auth", function($http, $q, $state, $localStorage, $connection
 	this.updateTokenIfNeeded = function()
 	{
 		var _this = this;
+		var deferred = $q.defer();
 
 		if (_this.isLogged())
-			return _this.token;
+			deferred.resolve(_this.token);
 
-		if ( (_this.username != null && _this.password != null) && !_this.isLogged())
-			return (function()
-			{
-				return _this.getAccessToken(_this.username, _this.password).then(function(response) {
-					_this.token     = response.data.access_token;
-					_this.tokenTime = response.data.expires_in;
-					_this.lastToken = (new Date()).getTime()*1000;
+		else if ( (_this.username != null && _this.password != null) && !_this.isLogged())
+			_this.getAccessToken(_this.username, _this.password).then(function(token) {
+				deferred.resolve(token)
+			});
 
-					return _this.token;
-				});
-			})();
+		else
+			deferred.resolve(false);
 
-		return;
+		return deferred.promise;
 	}
 
 	this.setBaseURL = function(string)
@@ -191,16 +188,7 @@ services.service("$auth", function($http, $q, $state, $localStorage, $connection
 	this.getToken = function()
 	{
 		var _this = this;
-
-		(function () {
-			return _this.isReady().then(function (data) {
-				return _this.updateTokenIfNeeded();
-			});
-		})();
-
-
 		return _this.token;
-
 	}
 
 });

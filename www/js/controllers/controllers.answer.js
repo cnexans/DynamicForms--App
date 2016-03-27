@@ -1,5 +1,5 @@
 controllers.controller('AnswerCtrl', 
-function($scope, $formsAPI, $localStorage, $auth, $ionicLoading, $stateParams, $q, $ionicPopup)
+function($scope, $formsAPI, $localStorage, $auth, $ionicLoading, $stateParams, $q, $ionicPopup, $state)
 {
 	$scope.stateInfo = '';
 	$scope.formId = $stateParams.formId;
@@ -15,7 +15,6 @@ function($scope, $formsAPI, $localStorage, $auth, $ionicLoading, $stateParams, $
 		var fieldObj = {
 			//Id del field descriptor, lo necesitaremos para enviar la respuesta..!
 			field_descriptor_id : value.id,
-
 			type     : value.type,
 			label    : value.label,
 			question : value.question
@@ -32,7 +31,6 @@ function($scope, $formsAPI, $localStorage, $auth, $ionicLoading, $stateParams, $
 		angular.forEach($scope.fields, function (field, k) {
 			var deferred = $q.defer();
 			validity = validity && field.valid();
-			console.log(field.valid());
 			deferred.resolve({
 				'id'    : k,
 				'valid' : field.valid()
@@ -41,19 +39,26 @@ function($scope, $formsAPI, $localStorage, $auth, $ionicLoading, $stateParams, $
 		});
 
 		$q.all(promises).then(function (fieldValidities) {
-			console.log($scope.fields)
-			console.log(fieldValidities)
-			console.log(validity)
 			if ( !validity )
+			{
 				$ionicPopup.alert({
 					title: 'Ups',
 					template: 'Alguno de los campos esta vacio, no olvide responderlo!'
 				});
+			}
 			else
+			{
+				$localStorage.registerAnswer({
+					'form_id' : $scope.formId,
+					'answers' : $scope.fields
+				});
 				$ionicPopup.alert({
 					title: 'Correcto',
-					template: 'Todos los campos estan llenos'
+					template: 'Se han guardado los datos, puede enviar las respuestas mediante el menu principal.'
+				}).then(function() {
+					$state.go('app.home');
 				});
+			}
 		})
 	}
 
