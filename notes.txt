@@ -1,0 +1,5 @@
+También creo que falta un listado de los formularios que se an guardado en la APP y que aun no se envían al servidor (solo el listado, para saber que se va a sincronizar)
+
+ver el progreso de la sincronización de datos (no solo el loading) 
+
+falta una opción para poder salir (logout) de la APP.... Saludos

@@ -1,0 +1,17 @@
+<ion-view view-title="Mis respuestas">
+	<ion-content overflow-scroll="false">
+
+		<div class="card" ng-show="forms.length == 0">
+			<div class="item item-text-wrap">
+				No hay respuestas aun :(
+			</div>
+		</div>
+
+		<ul class="list">
+		    <li class="item" ng-repeat="form in forms">
+				{{ form.name }}
+				<span class="badge badge-assertive">{{ form.number }}</span>
+		    </li>
+		</ul>
+	</ion-content>
+</ion-view>

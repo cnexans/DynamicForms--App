@@ -64,7 +64,49 @@ function($scope, $formsAPI, $localStorage, $auth, $ionicLoading, $stateParams, $
 	}
 
 });
-controllers.controller('AppCtrl', function($scope, $localStorage, $formsAPI, $q, $ionicLoading, $auth) {
+controllers.controller('AnsweredCtrl', function($scope, $localStorage)
+{
+	$scope.forms = [];
+	$scope.stateInfo = '';
+
+	var forms   = $localStorage.getForms();
+	var answers = $localStorage.getAllAnswers();
+
+	for (var i = 0; i < answers.length; i++)
+	{
+		var id     = answers[i].form_id;
+		var exists = false;
+		var name   = undefined;
+		var index  = undefined;
+
+		for (var j = 0; j < $scope.forms.length; j++) {
+			if ( $scope.forms[j].id == id )
+			{
+				exists = true;
+				index = j;
+			}
+
+		}
+
+		for (var j = 0; j < forms.length; j++)
+			if ( forms[j].id == id )
+				name = forms[j].name;
+
+
+		if ( !exists )
+			$scope.forms.push({
+				'id'     : id,
+				'name'   : name,
+				'number' : 1
+			});
+		else
+			$scope.forms[index].number++;
+
+	}
+});
+controllers.controller('AppCtrl',
+
+function($scope, $localStorage, $formsAPI, $q, $ionicLoading, $auth, $ionicPopup, $state) {
 
 	$scope.unorderedFields = [];
 
@@ -78,8 +120,10 @@ controllers.controller('AppCtrl', function($scope, $localStorage, $formsAPI, $q,
 
 		if ( _answers.length > 0 )
 		{
+			$scope.loadingStatus = 0;
 			$ionicLoading.show({
-				'template' : '<ion-spinner></ion-spinner>'
+				'template' : '{{ loadingStatus }}%',
+				'scope'    : $scope
 			});
 
 			$auth.isReady().then(function (status) {
@@ -98,6 +142,7 @@ controllers.controller('AppCtrl', function($scope, $localStorage, $formsAPI, $q,
 			counter += answer.answers.length;
 			$formsAPI.createFormInstance(answer.form_id).then(function (data) {
 				var instanceId = data.instance_id
+				console.log(data)
 				angular.forEach(answer.answers, function (fieldAnswer) {
 					fieldAnswer.form_instance_id = instanceId;
 					$scope.unorderedFields.push(fieldAnswer);
@@ -123,6 +168,9 @@ controllers.controller('AppCtrl', function($scope, $localStorage, $formsAPI, $q,
 	{
 		$formsAPI.uploadAnswer($scope.unorderedFields[$scope.currentField]).then(function (data) {
 			$scope.currentField++;
+			console.log(data)
+
+			$scope.loadingStatus = Math.round(($scope.currentField / $scope.fieldsCount)*100);
 			if ( $scope.currentField < $scope.fieldsCount )
 			{
 				$scope.executeSync();
@@ -132,6 +180,22 @@ controllers.controller('AppCtrl', function($scope, $localStorage, $formsAPI, $q,
 				$ionicLoading.hide();
 				$localStorage.resetAnswers();
 			}
+		});
+	}
+
+
+	$scope.logout = function()
+	{
+
+		$ionicPopup.confirm({
+			title: 'Cerrar sesion',
+			template: 'Si cierra sesion, se perderan las respuestas no enviadas. ¿Estas seguro?'
+		}).then(function(res) {
+			if( !res )
+				return;
+
+			$localStorage.resetUserData();
+			$state.go('login');
 		});
 	}
 

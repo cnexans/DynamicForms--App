@@ -717,6 +717,12 @@ services.service("$localStorage", function($http, $q, $state) {
 		return data;
 	}
 
+	this.resetUserData = function()
+	{
+		var _this = this;
+		_this.set('userData', '{}');
+	}
+
 
 	this.getForms = function()
 	{
@@ -790,6 +796,26 @@ services.service("$localStorage", function($http, $q, $state) {
 	{
 		var _this = this;
 		return _this.resetIndex('formAnswers');
+	}
+
+
+	this.failedSync = function()
+	{
+		var _this = this;
+		var answers = _this.get('failedSync');
+
+		if ( answers == null || answers == '' || (typeof answers === 'undefined') )
+		{
+			answers = _this.resetIndex('failedSync');
+		}
+
+		return answers;
+	}
+
+
+	this.setFailedSync = function(failed)
+	{
+		return _this.set('failedSync', failed);
 	}
 
 });

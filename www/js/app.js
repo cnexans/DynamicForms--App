@@ -58,7 +58,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
 		})
 
 	.state('app.home', {
-	url: '/home',
+		url: '/home',
 		views: {
 			'menuContent': {
 				templateUrl: 'templates/home.html',
@@ -68,11 +68,23 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
 	})
 
 	.state('app.answer', {
-	url: '/answer/:formId',
+		url: '/answer/:formId',
 		views: {
 			'menuContent': {
 				templateUrl: 'templates/answer.html',
 				controller: 'AnswerCtrl'
+			}
+		}
+	})
+
+
+	.state('app.answered', {
+		url   : '/answered',
+		cache : false,
+		views : {
+			'menuContent': {
+				templateUrl: 'templates/answered.html',
+				controller: 'AnsweredCtrl'
 			}
 		}
 	})
