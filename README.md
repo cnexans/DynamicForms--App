@@ -42,7 +42,7 @@ Built with Ionic and tested for iOS and Android it is composed by:
 * Services
   * Auth service
   * Connection service
-  * [DynamicForms API](https://github.com/cnexans/DynamicForms--API) service
+  * [API](https://github.com/cnexans/DynamicForms--API) service
 * Directives
   * General field directive
   * Current location
